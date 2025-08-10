@@ -3,6 +3,7 @@ import React from "react";
 import { usePdfBuilder } from "../hooks/use-pdf-builder";
 import { cn } from "@/lib/utils";
 import { generateQrDataUrl, generateBarcodeDataUrl } from "../lib/codes";
+import { getByPath } from "../lib/binding";
 
 export default function Canvas() {
   const { template, selectedPageId, selectedFieldId, removeField } =
@@ -52,7 +53,7 @@ export default function Canvas() {
 }
 
 function DraggableField({ fieldId }: { fieldId: string }) {
-  const { template, selectedPageId, updateField, selectField } =
+  const { template, data, selectedPageId, updateField, selectField } =
     usePdfBuilder();
   const page =
     template.pages.find((p) => p.id === selectedPageId) ?? template.pages[0];
@@ -160,6 +161,31 @@ function DraggableField({ fieldId }: { fieldId: string }) {
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
+  // Derive live display from data bindings without mutating the field
+  const bound = React.useMemo(() => {
+    if (!field.binding) return {} as any;
+    const v = getByPath(data, field.binding);
+    switch (field.type) {
+      case "text":
+      case "date":
+      case "qr":
+      case "barcode":
+        return {
+          value:
+            typeof v === "string" || typeof v === "number"
+              ? String(v)
+              : undefined,
+        };
+      case "checkbox":
+        return { checked: Boolean(v) };
+      case "image":
+      case "signature":
+        return { src: typeof v === "string" ? v : undefined };
+      default:
+        return {} as any;
+    }
+  }, [data, field.binding, field.type]);
+
   return (
     <div
       ref={ref}
@@ -192,7 +218,7 @@ function DraggableField({ fieldId }: { fieldId: string }) {
             opacity: field.opacity ?? 1,
           }}
         >
-          {(field as any).value ?? ""}
+          {bound.value ?? (field as any).value ?? ""}
         </div>
       )}
       {field.type === "date" && (
@@ -209,37 +235,44 @@ function DraggableField({ fieldId }: { fieldId: string }) {
             opacity: field.opacity ?? 1,
           }}
         >
-          {(field as any).value ?? ""}
+          {bound.value ?? (field as any).value ?? ""}
         </div>
       )}
       {field.type === "checkbox" && (
         <div className="w-full h-full flex items-center justify-center">
           <div className="size-3 border border-foreground rounded-[2px] flex items-center justify-center">
-            {(field as any).checked ? (
+            {bound.checked ?? (field as any).checked ? (
               <div className="size-2 bg-foreground" />
             ) : null}
           </div>
         </div>
       )}
-      {field.type === "image" && (field as any).src && (
+      {field.type === "image" && ((bound as any).src || (field as any).src) && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={(field as any).src}
+          src={(bound as any).src ?? (field as any).src}
           alt="img"
           className="w-full h-full object-contain pointer-events-none"
         />
       )}
-      {field.type === "signature" && (field as any).src && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={(field as any).src}
-          alt="sig"
-          className="w-full h-full object-contain pointer-events-none"
+      {field.type === "signature" &&
+        ((bound as any).src || (field as any).src) && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={(bound as any).src ?? (field as any).src}
+            alt="sig"
+            className="w-full h-full object-contain pointer-events-none"
+          />
+        )}
+      {field.type === "qr" && (
+        <QrPreview
+          value={(bound.value ?? (field as any).value ?? "") as string}
         />
       )}
-      {field.type === "qr" && <QrPreview value={(field as any).value ?? ""} />}
       {field.type === "barcode" && (
-        <BarcodePreview value={(field as any).value ?? ""} />
+        <BarcodePreview
+          value={(bound.value ?? (field as any).value ?? "") as string}
+        />
       )}
       {/* Inline editors overlay */}
       {editing && (

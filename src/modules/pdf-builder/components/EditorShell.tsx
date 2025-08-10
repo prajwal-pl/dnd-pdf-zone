@@ -14,7 +14,7 @@ import { saveTemplateFromForm } from "@/app/actions/templateAction";
 import { Switch } from "@/components/ui/switch";
 
 export const EditorShell = () => {
-  const { template, addPage, addField, selectPage, selectedPageId } =
+  const { template, data, addPage, addField, selectPage, selectedPageId } =
     usePdfBuilder();
   const activeId = selectedPageId ?? template.pages[0]?.id;
   const [editable, setEditable] = React.useState(false);
@@ -67,7 +67,7 @@ export const EditorShell = () => {
           <Button
             size="sm"
             onClick={async () => {
-              const bound = applyBindings(template, {});
+              const bound = applyBindings(template, data);
               const blob = await exportTemplateToPdf(bound, {
                 acroform: editable,
                 flatten: !editable,
