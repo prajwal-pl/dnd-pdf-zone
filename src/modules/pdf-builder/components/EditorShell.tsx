@@ -10,6 +10,7 @@ import { applyBindings } from "../lib/binding";
 import LeftPanel from "./LeftPanel";
 import Preview from "./Preview";
 import { saveTemplate } from "../lib/storage";
+import { saveTemplateFromForm } from "@/app/actions/templateAction";
 import { Switch } from "@/components/ui/switch";
 
 export const EditorShell = () => {
@@ -17,7 +18,7 @@ export const EditorShell = () => {
   const activeId = selectedPageId ?? template.pages[0]?.id;
   const [editable, setEditable] = React.useState(false);
   return (
-    <div className="grid grid-cols-[220px_1fr_320px] h-[calc(100dvh-4rem)] gap-2">
+    <div className="grid grid-cols-[280px_1fr_320px] h-[calc(100dvh-4rem)] gap-2">
       <aside className="border-r p-2 overflow-auto">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-medium">Pages</h3>
@@ -30,7 +31,7 @@ export const EditorShell = () => {
       <main className="bg-muted/30 flex items-center justify-center">
         <Canvas />
       </main>
-      <section className="border-l p-2 overflow-auto space-y-3">
+  <section className="border-l p-2 overflow-auto space-y-2">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <h3 className="text-sm font-medium">Properties</h3>
@@ -59,15 +60,19 @@ export const EditorShell = () => {
           </Button>
         </div>
         <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={async () => {
-              await saveTemplate(template);
+          <form
+            action={async (formData) => {
+              const payload = JSON.stringify(template);
+              formData.set("template", payload);
+              const res = await saveTemplateFromForm(formData);
+              if (!res?.ok) {
+                console.error(res?.error || "Failed to save template");
+              }
             }}
           >
-            Save Template
-          </Button>
+            <input type="hidden" name="template" value={JSON.stringify(template)} readOnly />
+            <Button size="sm" variant="outline" type="submit">Save Template</Button>
+          </form>
           <Button
             size="sm"
             variant="outline"

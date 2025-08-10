@@ -32,6 +32,7 @@ export async function exportTemplateToPdf(
         });
       } catch (e) {
         // ignore background if failed
+        console.log(e);
       }
     }
 
@@ -202,7 +203,10 @@ async function drawField(
       const val = (f as any).value ?? "";
       if (val) {
         try {
-          const dataUrl = await generateQrDataUrl(String(val), Math.floor(Math.min((f as any).width, (f as any).height)));
+          const dataUrl = await generateQrDataUrl(
+            String(val),
+            Math.floor(Math.min((f as any).width, (f as any).height))
+          );
           const bytes = dataUrlToBytes(dataUrl);
           const img = await pdfDoc.embedPng(bytes);
           page.drawImage(img, {
@@ -213,7 +217,14 @@ async function drawField(
           });
         } catch {
           // fallback: box
-          page.drawRectangle({ x: (f as any).x, y, width: (f as any).width, height: (f as any).height, opacity: 0.05, color: rgb(0, 0, 0) });
+          page.drawRectangle({
+            x: (f as any).x,
+            y,
+            width: (f as any).width,
+            height: (f as any).height,
+            opacity: 0.05,
+            color: rgb(0, 0, 0),
+          });
         }
       }
       return;
@@ -236,7 +247,14 @@ async function drawField(
             height: (f as any).height,
           });
         } catch {
-          page.drawRectangle({ x: (f as any).x, y, width: (f as any).width, height: (f as any).height, opacity: 0.05, color: rgb(0, 0, 0) });
+          page.drawRectangle({
+            x: (f as any).x,
+            y,
+            width: (f as any).width,
+            height: (f as any).height,
+            opacity: 0.05,
+            color: rgb(0, 0, 0),
+          });
         }
       }
       return;

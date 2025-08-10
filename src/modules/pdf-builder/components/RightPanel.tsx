@@ -12,6 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Toggle } from "@/components/ui/toggle";
+import { Calendar } from "@/components/ui/calendar";
+import { format, parseISO, isValid } from "date-fns";
 
 export default function RightPanel() {
   const {
@@ -26,9 +28,20 @@ export default function RightPanel() {
     template.pages.find((p) => p.id === selectedPageId) ?? template.pages[0];
   const field = page?.fields.find((f) => f.id === selectedFieldId);
   const [text, setText] = React.useState<string>(JSON.stringify(data, null, 2));
+  const selectedDate = (() => {
+    if (!field || field.type !== "date") return undefined;
+    const v = (field as any).value as string | undefined;
+    if (!v) return undefined;
+    try {
+      const d = parseISO(v);
+      return isValid(d) ? d : undefined;
+    } catch {
+      return undefined;
+    }
+  })();
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
+    <div className="space-y-3">
+      <div className="space-y-1.5">
         <h4 className="text-sm font-medium">Selected Field</h4>
         {!field ? (
           <p className="text-xs text-muted-foreground">
@@ -36,7 +49,7 @@ export default function RightPanel() {
           </p>
         ) : (
           <div className="space-y-2">
-            <div className="grid gap-1.5">
+            <div className="grid gap-1">
               <Label htmlFor="fld-name" className="text-xs">
                 Name
               </Label>
@@ -48,7 +61,7 @@ export default function RightPanel() {
                 }
               />
             </div>
-            <div className="grid gap-1.5">
+            <div className="grid gap-1">
               <Label htmlFor="fld-binding" className="text-xs">
                 Binding Path (e.g. user.firstName)
               </Label>
@@ -63,7 +76,7 @@ export default function RightPanel() {
             </div>
             {field.type === "text" && (
               <>
-                <div className="grid gap-1.5">
+                <div className="grid gap-1">
                   <Label htmlFor="fld-value" className="text-xs">
                     Text Value (for preview)
                   </Label>
@@ -75,7 +88,7 @@ export default function RightPanel() {
                     }
                   />
                 </div>
-                <div className="grid gap-1.5">
+                <div className="grid gap-1">
                   <Label className="text-xs">Font Size</Label>
                   <Input
                     type="number"
@@ -92,7 +105,7 @@ export default function RightPanel() {
                     }
                   />
                 </div>
-                <div className="grid gap-1.5">
+                <div className="grid gap-1">
                   <Label className="text-xs">Color</Label>
                   <Input
                     type="color"
@@ -139,7 +152,7 @@ export default function RightPanel() {
                     Underline
                   </Toggle>
                 </div>
-                <div className="grid gap-1.5">
+                <div className="grid gap-1">
                   <Label className="text-xs">Align</Label>
                   <Select
                     value={field.style?.align ?? "left"}
@@ -163,20 +176,24 @@ export default function RightPanel() {
             )}
             {field.type === "date" && (
               <>
-                <div className="grid gap-1.5">
-                  <Label htmlFor="fld-date" className="text-xs">
-                    Date Value
-                  </Label>
-                  <Input
-                    id="fld-date"
-                    type="date"
-                    value={(field as any).value ?? ""}
-                    onChange={(e) =>
-                      updateField(field.id, { value: e.target.value } as any)
-                    }
-                  />
+                <div className="grid gap-1">
+                  <Label className="text-xs">Date</Label>
+                  <div className="border rounded-md p-2">
+                    <Calendar
+                      mode="single"
+                      captionLayout="dropdown"
+                      fromYear={1900}
+                      toYear={2100}
+                      showOutsideDays
+                      selected={selectedDate}
+                      onSelect={(d) => {
+                        if (!d) return;
+                        updateField(field.id, { value: format(d, "yyyy-MM-dd") } as any);
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="grid gap-1.5">
+                <div className="grid gap-1">
                   <Label className="text-xs">Font Size</Label>
                   <Input
                     type="number"
@@ -299,20 +316,6 @@ export default function RightPanel() {
               <p className="text-xs text-muted-foreground">
                 Double‑click the signature box on the canvas to draw and save.
               </p>
-            )}
-            {field.type === "qr" && (
-              <div className="grid gap-1.5">
-                <Label htmlFor="fld-qr" className="text-xs">
-                  QR Value
-                </Label>
-                <Input
-                  id="fld-qr"
-                  value={(field as any).value ?? ""}
-                  onChange={(e) =>
-                    updateField(field.id, { value: e.target.value } as any)
-                  }
-                />
-              </div>
             )}
             {field.type === "barcode" && (
               <div className="grid gap-1.5">
