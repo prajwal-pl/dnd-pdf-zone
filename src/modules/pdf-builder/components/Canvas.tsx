@@ -13,7 +13,17 @@ export default function Canvas() {
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!selectedFieldId) return;
-      if (e.key === "Delete" || e.key === "Backspace") {
+      // Ignore when typing in inputs/textareas/contenteditable
+      const ae = document.activeElement as HTMLElement | null;
+      if (
+        ae &&
+        (ae.tagName === "INPUT" ||
+          ae.tagName === "TEXTAREA" ||
+          ae.isContentEditable)
+      ) {
+        return;
+      }
+      if (e.key === "Delete") {
         e.preventDefault();
         removeField(selectedFieldId);
       }
