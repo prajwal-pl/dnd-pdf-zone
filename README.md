@@ -2,7 +2,7 @@
 
 Web-based PDF editor to design print-ready PDFs by placing fields on top of page images with pixel-accurate WYSIWYG, live preview, data-binding, and database-backed templates.
 
-Video demo: https://example.com/video-demo
+Video demo: https://vimeo.com/1108817563?share=copy
 
 ## Objective
 
@@ -128,4 +128,4 @@ npm start
 
 ## Video URL
 
-Demo video: https://example.com/video-demo
+Demo video: https://vimeo.com/1108817563?share=copy
