@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 import { generateQrDataUrl, generateBarcodeDataUrl } from "../lib/codes";
 
 export default function Canvas() {
-  const { template, selectedPageId, selectedFieldId, removeField } = usePdfBuilder();
+  const { template, selectedPageId, selectedFieldId, removeField } =
+    usePdfBuilder();
   const page =
     template.pages.find((p) => p.id === selectedPageId) ?? template.pages[0];
   if (!page) return null;
@@ -373,5 +374,7 @@ function BarcodePreview({ value }: { value: string }) {
       </div>
     );
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} alt="barcode" className="w-full h-full object-contain" />;
+  return (
+    <img src={src} alt="barcode" className="w-full h-full object-contain" />
+  );
 }

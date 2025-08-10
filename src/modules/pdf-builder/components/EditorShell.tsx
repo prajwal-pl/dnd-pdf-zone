@@ -14,7 +14,8 @@ import { saveTemplateFromForm } from "@/app/actions/templateAction";
 import { Switch } from "@/components/ui/switch";
 
 export const EditorShell = () => {
-  const { template, addPage, addField, selectPage, selectedPageId } = usePdfBuilder();
+  const { template, addPage, addField, selectPage, selectedPageId } =
+    usePdfBuilder();
   const activeId = selectedPageId ?? template.pages[0]?.id;
   const [editable, setEditable] = React.useState(false);
   return (
@@ -23,21 +24,27 @@ export const EditorShell = () => {
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-medium">Pages</h3>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={() => {
-              const pid = selectedPageId ?? template.pages[0]?.id;
-              if (!pid) return;
-              addField(pid, {
-                type: "image",
-                x: 60,
-                y: 60,
-                width: 180,
-                height: 120,
-                rotation: 0,
-                opacity: 1,
-                name: "Image",
-                required: false,
-              } as any);
-            }}>+ Image</Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                const pid = selectedPageId ?? template.pages[0]?.id;
+                if (!pid) return;
+                addField(pid, {
+                  type: "image",
+                  x: 60,
+                  y: 60,
+                  width: 180,
+                  height: 120,
+                  rotation: 0,
+                  opacity: 1,
+                  name: "Image",
+                  required: false,
+                } as any);
+              }}
+            >
+              + Image
+            </Button>
             <Button size="sm" onClick={() => addPage()}>
               + Page
             </Button>
@@ -48,7 +55,7 @@ export const EditorShell = () => {
       <main className="bg-muted/30 flex items-center justify-center">
         <Canvas />
       </main>
-  <section className="border-l p-2 overflow-auto space-y-2">
+      <section className="border-l p-2 overflow-auto space-y-2">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <h3 className="text-sm font-medium">Properties</h3>
@@ -87,8 +94,15 @@ export const EditorShell = () => {
               }
             }}
           >
-            <input type="hidden" name="template" value={JSON.stringify(template)} readOnly />
-            <Button size="sm" variant="outline" type="submit">Save Template</Button>
+            <input
+              type="hidden"
+              name="template"
+              value={JSON.stringify(template)}
+              readOnly
+            />
+            <Button size="sm" variant="outline" type="submit">
+              Save Template
+            </Button>
           </form>
           <Button
             size="sm"

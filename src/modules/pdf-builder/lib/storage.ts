@@ -7,19 +7,22 @@ import {
 
 const KEY = "pdf-builder:templates";
 
-export async function listTemplates(): Promise<{
-  id: string;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-  pages: number;
-  fields: number;
-}[]> {
+export async function listTemplates(): Promise<
+  {
+    id: string;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+    pages: number;
+    fields: number;
+  }[]
+> {
   try {
     return await listTemplatesAction();
   } catch {}
   // fallback to localStorage
-  const raw = typeof localStorage !== "undefined" ? localStorage.getItem(KEY) : null;
+  const raw =
+    typeof localStorage !== "undefined" ? localStorage.getItem(KEY) : null;
   if (!raw) return [];
   try {
     const arr = JSON.parse(raw) as Template[];
@@ -55,7 +58,8 @@ export async function loadTemplate(id: string): Promise<Template | null> {
   try {
     return await loadTemplateAction(id);
   } catch {}
-  const raw = typeof localStorage !== "undefined" ? localStorage.getItem(KEY) : null;
+  const raw =
+    typeof localStorage !== "undefined" ? localStorage.getItem(KEY) : null;
   if (!raw) return null;
   try {
     const arr = JSON.parse(raw) as Template[];

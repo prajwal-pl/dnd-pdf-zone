@@ -186,8 +186,11 @@ async function drawField(
             bytes = buf;
           }
           if (bytes) {
-            const isPng = src.includes(".png") || src.startsWith("data:image/png");
-            const img = isPng ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
+            const isPng =
+              src.includes(".png") || src.startsWith("data:image/png");
+            const img = isPng
+              ? await pdfDoc.embedPng(bytes)
+              : await pdfDoc.embedJpg(bytes);
             page.drawImage(img, {
               x: f.x,
               y,

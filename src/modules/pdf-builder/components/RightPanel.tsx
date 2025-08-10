@@ -189,7 +189,9 @@ export default function RightPanel() {
                       selected={selectedDate}
                       onSelect={(d) => {
                         if (!d) return;
-                        updateField(field.id, { value: format(d, "yyyy-MM-dd") } as any);
+                        updateField(field.id, {
+                          value: format(d, "yyyy-MM-dd"),
+                        } as any);
                       }}
                     />
                   </div>
