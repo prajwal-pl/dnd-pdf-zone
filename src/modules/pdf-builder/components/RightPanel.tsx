@@ -14,6 +14,7 @@ import {
 import { Toggle } from "@/components/ui/toggle";
 import { Calendar } from "@/components/ui/calendar";
 import { format, parseISO, isValid } from "date-fns";
+import { UploadButton } from "@/utils/uploadthing";
 
 export default function RightPanel() {
   const {
@@ -294,41 +295,19 @@ export default function RightPanel() {
               </div>
             )}
             {field.type === "image" && (
-              <div className="grid gap-1.5">
+              <div className="grid gap-1">
                 <Label className="text-xs">Upload Image</Label>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (!f) return;
-                    const reader = new FileReader();
-                    reader.onload = () =>
-                      updateField(field.id, {
-                        src: String(reader.result),
-                      } as any);
-                    reader.readAsDataURL(f);
-                  }}
-                />
-              </div>
-            )}
-            {field.type === "signature" && (
-              <p className="text-xs text-muted-foreground">
-                Double‑click the signature box on the canvas to draw and save.
-              </p>
-            )}
-            {field.type === "barcode" && (
-              <div className="grid gap-1.5">
-                <Label htmlFor="fld-barcode" className="text-xs">
-                  Barcode Value
-                </Label>
-                <Input
-                  id="fld-barcode"
-                  value={(field as any).value ?? ""}
-                  onChange={(e) =>
-                    updateField(field.id, { value: e.target.value } as any)
-                  }
-                />
+                <div>
+                  <UploadButton
+                    endpoint="imageUploader"
+                    onClientUploadComplete={(res) => {
+                      const url = res?.[0]?.ufsUrl || res?.[0]?.url;
+                      if (url) updateField(field.id, { src: url } as any);
+                    }}
+                    onUploadError={(e) => console.error(e)}
+                    content={{ button: "Upload Image" }}
+                  />
+                </div>
               </div>
             )}
           </div>

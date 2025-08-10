@@ -174,28 +174,41 @@ async function drawField(
     case "signature": {
       const y = yTopToPdf(f.y, f.height, pageHeight);
       const src = (f as any).src;
-      if (typeof src === "string" && src.startsWith("data:image/")) {
-        const bytes = dataUrlToBytes(src);
-        const img = src.startsWith("data:image/png")
-          ? await pdfDoc.embedPng(bytes)
-          : await pdfDoc.embedJpg(bytes);
-        page.drawImage(img, {
-          x: f.x,
-          y,
-          width: f.width,
-          height: f.height,
-          opacity: f.opacity ?? 1,
-        });
-      } else {
-        page.drawRectangle({
-          x: f.x,
-          y,
-          width: f.width,
-          height: f.height,
-          opacity: 0.05,
-          color: rgb(0, 0, 0),
-        });
+      if (typeof src === "string") {
+        try {
+          let bytes: Uint8Array | undefined;
+          if (src.startsWith("data:image/")) {
+            bytes = dataUrlToBytes(src);
+          } else {
+            // fetch remote image URL
+            const res = await fetch(src);
+            const buf = new Uint8Array(await res.arrayBuffer());
+            bytes = buf;
+          }
+          if (bytes) {
+            const isPng = src.includes(".png") || src.startsWith("data:image/png");
+            const img = isPng ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
+            page.drawImage(img, {
+              x: f.x,
+              y,
+              width: f.width,
+              height: f.height,
+              opacity: f.opacity ?? 1,
+            });
+            return;
+          }
+        } catch {
+          // fallthrough to placeholder
+        }
       }
+      page.drawRectangle({
+        x: f.x,
+        y,
+        width: f.width,
+        height: f.height,
+        opacity: 0.05,
+        color: rgb(0, 0, 0),
+      });
       return;
     }
     case "qr": {

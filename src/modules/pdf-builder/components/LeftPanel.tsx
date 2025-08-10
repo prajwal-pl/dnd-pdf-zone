@@ -6,20 +6,11 @@ import { cn } from "@/lib/utils";
 import { listTemplates, loadTemplate } from "../lib/storage";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarIcon, FileText, Layers } from "lucide-react";
+import { UploadButton } from "@/utils/uploadthing";
 
 export default function LeftPanel() {
   const { template, selectPage, selectedPageId, setBackground, reorderPages } =
     usePdfBuilder();
-  const onUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    pageId: string
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const url = await toDataURL(file);
-    setBackground(pageId, url);
-    e.currentTarget.value = "";
-  };
   return (
   <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -44,15 +35,15 @@ export default function LeftPanel() {
               </div>
             </button>
             <div className="flex items-center gap-2 mt-1.5">
-              <label className="text-xs inline-block">
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => onUpload(e, p.id)}
-                />
-                <span className="underline cursor-pointer">Upload BG</span>
-              </label>
+              <UploadButton
+                endpoint="imageUploader"
+                onClientUploadComplete={(res) => {
+                  const url = res?.[0]?.ufsUrl || res?.[0]?.url;
+                  if (url) setBackground(p.id, url);
+                }}
+                onUploadError={(e) => console.error(e)}
+                content={{ button: "Set BG" }}
+              />
               <Button
                 size="sm"
                 variant="outline"
@@ -84,16 +75,6 @@ export default function LeftPanel() {
       </div>
     </div>
   );
-}
-
-async function toDataURL(file: File) {
-  const r = new FileReader();
-  const p = new Promise<string>((resolve, reject) => {
-    r.onload = () => resolve(String(r.result));
-    r.onerror = reject;
-  });
-  r.readAsDataURL(file);
-  return p;
 }
 
 function TemplatesList({ onLoadTemplate }: { onLoadTemplate: (id: string) => void | Promise<void> }) {

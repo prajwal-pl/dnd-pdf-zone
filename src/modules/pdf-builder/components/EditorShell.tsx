@@ -14,7 +14,7 @@ import { saveTemplateFromForm } from "@/app/actions/templateAction";
 import { Switch } from "@/components/ui/switch";
 
 export const EditorShell = () => {
-  const { template, addPage, selectPage, selectedPageId } = usePdfBuilder();
+  const { template, addPage, addField, selectPage, selectedPageId } = usePdfBuilder();
   const activeId = selectedPageId ?? template.pages[0]?.id;
   const [editable, setEditable] = React.useState(false);
   return (
@@ -22,9 +22,26 @@ export const EditorShell = () => {
       <aside className="border-r p-2 overflow-auto">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-medium">Pages</h3>
-          <Button size="sm" onClick={() => addPage()}>
-            Add
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => {
+              const pid = selectedPageId ?? template.pages[0]?.id;
+              if (!pid) return;
+              addField(pid, {
+                type: "image",
+                x: 60,
+                y: 60,
+                width: 180,
+                height: 120,
+                rotation: 0,
+                opacity: 1,
+                name: "Image",
+                required: false,
+              } as any);
+            }}>+ Image</Button>
+            <Button size="sm" onClick={() => addPage()}>
+              + Page
+            </Button>
+          </div>
         </div>
         <LeftPanel />
       </aside>

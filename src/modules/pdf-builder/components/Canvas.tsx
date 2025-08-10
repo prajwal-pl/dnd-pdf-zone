@@ -5,10 +5,21 @@ import { cn } from "@/lib/utils";
 import { generateQrDataUrl, generateBarcodeDataUrl } from "../lib/codes";
 
 export default function Canvas() {
-  const { template, selectedPageId } = usePdfBuilder();
+  const { template, selectedPageId, selectedFieldId, removeField } = usePdfBuilder();
   const page =
     template.pages.find((p) => p.id === selectedPageId) ?? template.pages[0];
   if (!page) return null;
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!selectedFieldId) return;
+      if (e.key === "Delete" || e.key === "Backspace") {
+        e.preventDefault();
+        removeField(selectedFieldId);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedFieldId, removeField]);
   return (
     <div
       className="relative bg-white shadow"
