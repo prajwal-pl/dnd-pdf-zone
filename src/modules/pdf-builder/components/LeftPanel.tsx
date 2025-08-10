@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { listTemplates, loadTemplate } from "../lib/storage";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarIcon, FileText, Layers } from "lucide-react";
-import { UploadButton } from "@/utils/uploadthing";
 
 export default function LeftPanel() {
   const { template, selectPage, selectedPageId, setBackground, reorderPages } =
@@ -35,15 +34,6 @@ export default function LeftPanel() {
               </div>
             </button>
             <div className="flex items-center gap-2 mt-1.5">
-              <UploadButton
-                endpoint="imageUploader"
-                onClientUploadComplete={(res) => {
-                  const url = res?.[0]?.ufsUrl || res?.[0]?.url;
-                  if (url) setBackground(p.id, url);
-                }}
-                onUploadError={(e) => console.error(e)}
-                content={{ button: "Set BG" }}
-              />
               <Button
                 size="sm"
                 variant="outline"
