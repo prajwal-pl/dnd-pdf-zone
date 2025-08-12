@@ -57,7 +57,7 @@ export async function saveTemplateAction(
       payload: template,
     },
   });
-  // Optional: revalidate any paths that show template listings
+  //  revalidate any paths that show template listings
   try {
     revalidatePath("/");
   } catch {}
